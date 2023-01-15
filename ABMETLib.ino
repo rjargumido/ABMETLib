@@ -10,25 +10,23 @@ uint32_t timestamp() {
     return now.unixtime();
 }
 
-char* getDateTime(unsigned long timeInUnix) {
-    char buff[32];
-    const String months[12] = {"January", "February", "March", "May", "June", "July", "August", "September", "October", "November", "December"};
-    
-    //const String h = (hour(timeInUnix) > 12) ? (String)(hour(timeInUnix) % 12) : (String)(hour(timeInUnix));
+char* getDateTime(unsigned long _t) {
+    const String months[12] = {"January", "February", "March", "May",
+     "June", "July", "August", "September", "October", "November", "December"};
     
     int h = 0;
     String ref = "";
-    if(hour(timeInUnix) > 12) {
+    if(hour(_t) > 12) {
         // PM
-        h = hour(timeInUnix) % 12;
+        h = hour(_t) % 12;
         ref = "PM";
     } else {
-        h = hour(timeInUnix);
+        h = hour(_t);
         ref = "AM";
     }
     
-    sprintf(buff, "%s %02d, %02d %02d:%02d:%02d %s", months[month(timeInUnix) - 1], day(timeInUnix), year(timeInUnix), h, minute(timeInUnix), second(timeInUnix), ref);
-    Serial.println(buff);
+    char buff[32];
+    sprintf(buff, "%s %02d, %02d %02d:%02d:%02d %s", months[month(_t) - 1], day(_t), year(_t), h, minute(_t), second(_t), ref);
     return buff;
 }
 
@@ -42,12 +40,8 @@ void setup() {
         while (1) delay(10);
     }
     
-    if (rtc.lostPower()) {
-        Serial.println("RTC lost power, let's set the time!");
-        // When time needs to be set on a new device, or after a power loss, the
-        // following line sets the RTC to the date & time this sketch was compiled
-        rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-    }
+    // Sets RTC Date & Time 
+    if (rtc.lostPower()) { rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); }
 
     Serial.println("Running");
 }
